@@ -7,8 +7,8 @@
 
 const char* wordsStock[] = {
         "bill", "hill", "pill", "meal", "stamina", "bend", "defend", "demand", "rent", "pizza",
-        "visa", "vodka", "badly", "sadly", "vividly", "portal", "normal", "sauna", "branch", "crunch",
-        "Tarzan", "seaman", " woman", "ran", "man", "sand", "cargo", "Virgo", "receipt"
+         "visa", "vodka", "badly", "sadly", "vividly", "portal", "normal", "sauna", "branch", "crunch",
+         "Tarzan", "seaman", " woman", "ran", "man", "sand", "cargo", "Virgo", "receipt"
 };
 
 void PrintLimerick(char* arr[], int sz);
@@ -68,7 +68,7 @@ void main() {
 }
 
 
-///////////////////////////////// ************* Basic assembling functions ************* /////////////////////////////////
+        ///////////////////////////////// ************* Basic assembling functions ************* /////////////////////////////////
 
 
 int HaveSimilarEnding(char* str1, const char* str2, int num)
@@ -246,19 +246,19 @@ void PrintLimerick(char* arr[], int sz)
 
 void getln(char** str)
 {
-    char ch;
-    int i=0;
-    while(ch != '\n')
-    {
-        ch = getchar();
-        *str[i] = ch;
-        i++;
-        *str = realloc(*str,i*sizeof(char));
-    }
-    *str[i] = '\0';
+       char ch;
+       int i=0;
+       while(ch != '\n')
+      {
+          ch = getchar();
+          *str[i] = ch;
+          i++;
+          *str = realloc(*str,i*sizeof(char));
+      }
+      *str[i] = '\0';
 }
 
-///////////////////////////////// ************* Functions assigned to rows  ************* /////////////////////////////////
+        ///////////////////////////////// ************* Functions assigned to rows  ************* /////////////////////////////////
 
 char* BuildRow0(char* row)
 {
@@ -380,6 +380,7 @@ char* BuildRow3(char* row1, char* row0)
     else
     {
         printf("The two sentences don't rhyme.");
+        free(sentence);
         return row1;
 
     }
@@ -395,10 +396,10 @@ char* BuildRow4(char* row)
     rowAfter = DeleteWord(rowAfter, 0);
 
     printf("Write a a begining that fits the sentence: \n%s \n*Note it's the first sentence with a new beginning.\n", rowAfter);
-//    getln(&sentence);
-    sentence = "yes i am";
+    getln(&sentence);
 
     rowAfter = InsertWord(rowAfter, 0, sentence);
+    free(sentence);
 
     return rowAfter;
 
