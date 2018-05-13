@@ -22,7 +22,7 @@ char* ReplaceWord(char* str, char* word1, char* word2);
 char* BuildRow0(char* row);
 char* BuildRow1(char* row1, char* row0);
 char* BuildRow2(char* row);
-char* BuildRow3(char* row1, char* row0);
+char* BuildRow3(char* row3, char* row2);
 char* BuildRow4(char* row);
 
 
@@ -45,18 +45,23 @@ void main() {
 
         switch(indexRow) {
             case 0:
+                fflush(stdin);
                 limerick[0] = BuildRow0(limerick[0]);
                 break;
             case 1:
+                fflush(stdin);
                 limerick[1] = BuildRow1(limerick[1], limerick[0]);
                 break;
             case 2:
+                fflush(stdin);
                 limerick[2] = BuildRow2(limerick[2]);
                 break;
             case 3:
+                fflush(stdin);
                 limerick[3] = BuildRow3(limerick[3], limerick[2]);
                 break;
             case 4:
+                fflush(stdin);
                 limerick[4] = BuildRow4(limerick[0]);
                 break;
             default:
@@ -189,42 +194,20 @@ char* InsertWord(char* str, int index, char* word)
 
 char* ReplaceWord(char* str, char* word1, char* word2)
 {
-    int charIndex = 0;
     char *pos = strstr(str, word1);
-    int wordEndingIndex;
     int wordStartingIndex = pos-str;
     int lengthWord1 = strlen(word1);
-    int lengthCounter = 0;
+    int lengthWord2 = strlen(word2);
+    int lengthStr = strlen(str);
 
-    if (pos != NULL)
+    if(pos != 0)
     {
-        // finding 'str' length and 'word1' ending index (starting index will not suffice) //
-        while(str[charIndex] !='\0')
-        {
-            if(wordStartingIndex <= charIndex && lengthCounter <= lengthWord1)
-            {
-                wordEndingIndex = charIndex;
-                lengthCounter++;
-            }
-            charIndex++;
-        }
-
-        // allocating new dynamic memory for temporary strings to work with //
-        char* firstPart = (char*)malloc((charIndex+10)*sizeof(char));
-        char* secondPart = (char*)malloc((charIndex)*sizeof(char));
-
-        // filling the new strings with parts of the original string //
-        strncpy ( firstPart, str, wordStartingIndex );
-        strncpy ( secondPart, str + wordEndingIndex, charIndex - wordEndingIndex);
-
-        // building the new string to send forward //
-        strcat(firstPart, word2);
-        strcat(firstPart, secondPart);
-
-        free(secondPart);
-        return firstPart;
+        char* newStr = malloc(lengthStr + lengthWord2 - lengthWord1);
+        memcpy(newStr, str, wordStartingIndex );
+        memcpy(newStr+wordStartingIndex, word2, lengthWord2 );
+        memcpy(newStr+wordStartingIndex+lengthWord2, str+wordStartingIndex+lengthWord1, lengthStr-lengthWord1-wordStartingIndex);
+        return newStr;
     }
-
     else
     {
         printf("|%s| is not a sub-string\n", word1);
@@ -246,16 +229,18 @@ void PrintLimerick(char* arr[], int sz)
 
 void getln(char** str)
 {
-       char ch;
+       char ch = 0;
        int i=0;
+       *str = malloc(10*sizeof(char));
        while(ch != '\n')
       {
           ch = getchar();
-          *str[i] = ch;
-          i++;
-          *str = realloc(*str,i*sizeof(char));
+          if(ch != '\n')
+              (*str)[i] = ch;
+          if(++i % 10 == 0)
+            *str = realloc(*str,(i+10)*sizeof(char));
       }
-      *str[i] = '\0';
+    (*str)[i] = '\0';
 }
 
         ///////////////////////////////// ************* Functions assigned to rows  ************* /////////////////////////////////
@@ -263,54 +248,49 @@ void getln(char** str)
 char* BuildRow0(char* row)
 {
     int choice;
-    char* before = "…";
-    char* person = (char*)malloc(1*sizeof(char));
-    char* origin = (char*)malloc(1*sizeof(char));
+    char* person;
+    char* origin;
     char* rowAfter;
     printf("\nRow 0: %s.", row);
 
     printf("\nChoose who is the the lead character:\n"
-           "0 - Young  man.\n"
+           "0 - Young man.\n"
            "1 - Old man.\n"
            "2 - Young lady.\n"
            "3 - Old lady.\n"
            "4 - Write yourself:\n");
 
     scanf("%d", &choice);
-
+    getchar();
     switch(choice) {
         case 0:
-            strcpy(person, "a young man");
-            rowAfter = ReplaceWord(row, before, person);
+            rowAfter = ReplaceWord(row, "…", "a young man");
             break;
         case 1:
-            strcpy(person, "an old man");
-            rowAfter = ReplaceWord(row, before, person);
+            rowAfter = ReplaceWord(row, "…", "an old man");
             break;
         case 2:
-            strcpy(person, "a young lady");
-            rowAfter = ReplaceWord(row, before, person);
+            rowAfter = ReplaceWord(row, "…", "a young lady");
             break;
         case 3:
-            strcpy(person, "an old lady");
-            rowAfter = ReplaceWord(row, before, person);
+            rowAfter = ReplaceWord(row, "…", "an old lady");
             break;
         case 4:
             printf("\nWrite here: ");
             getln(&person);
-            rowAfter = ReplaceWord(row, before, person);
+            rowAfter = ReplaceWord(row, "…", person);
+            free(person);
             break;
         default:
             printf("\n You need to choose between 0-4.");
             return row;
     }
 
-    printf("%s", rowAfter);
-    printf("\n\nNow write here where he/she is from: ");
-    getln(&origin);
-    rowAfter = ReplaceWord(rowAfter, before, origin);
+    printf(rowAfter);
+    printf("\nNow write here where he/she is from: ");
 
-    free(person);
+    getln(&origin);
+    rowAfter = ReplaceWord(rowAfter, "…", origin);
     free(origin);
 
     return rowAfter;
@@ -318,11 +298,10 @@ char* BuildRow0(char* row)
 
 char* BuildRow1(char* row1, char* row0)
 {
-    char* before = "…";
-    char* rhyme = (char*)malloc(1*sizeof(char));
+    char* rhyme;
     char* rowAfter;
 
-    printf("\nFinish the sentence:\n %s \nSo it will rhyme with the previous sentence:\n %s", row0, row1);
+    printf("\nFinish the sentence:\n %s \nSo it will rhyme with the previous sentence:\n %s", row1, row0);
     printf("\n\nHere's a list of suggestions you can end the sentence with:\n");
 
     for (int i = 1; i < size_wordsStock; i++)
@@ -333,46 +312,61 @@ char* BuildRow1(char* row1, char* row0)
             printf("%s ,", wordsStock[i]);
         }
     }
+    printf("\n");
+    getchar();
     getln(&rhyme);
-    rowAfter = ReplaceWord(row1, before, rhyme);
-    free(rhyme);
 
-    return rowAfter;
+    int same = HaveSimilarEnding(row0, rhyme, 1);
+
+    if(same == 1)
+    {
+        rowAfter = ReplaceWord(row1, "…", rhyme);
+        free(rhyme);
+        return rowAfter;
+
+    }
+    else
+    {
+        printf("The two sentences don't rhyme.");
+        free(rhyme);
+        return row1;
+
+    }
 }
 
 char* BuildRow2(char* row)
 {
-    char* before = "…";
-    char* sentence = (char*)malloc(1*sizeof(char));
+    char* sentence;
     char* rowAfter;
 
     rowAfter = DeleteWord(row, 0);
 
     printf("\nFinish the sentence:\n %s \n*Note that it needs to rhyme with the next row.\n", row);
+    printf("Your sentence before editing:\n %s\nWrite here:\n", rowAfter);
+    getchar();
     getln(&sentence);
 
-    rowAfter = ReplaceWord(row, before, sentence);
+    rowAfter = ReplaceWord(rowAfter, "…", sentence);
     free(sentence);
 
     return rowAfter;
 }
 
-char* BuildRow3(char* row1, char* row0)
+char* BuildRow3(char* row3, char* row2)
 {
-    char* before = "…";
-    char* sentence = (char*)malloc(1*sizeof(char));
+    char* sentence;
     char* rowAfter;
 
-    rowAfter = DeleteWord(row1, -1);
-
-    printf("\nFinish the sentence:\n %s \nSo it will rhyme with the previous sentence:\n %s", row1, row0);
+    printf("\nWrite the sentence from the beginning:\n %s \nSo it will rhyme with the previous sentence:\n %s", row3, row2);
+    printf("\nWrite here:\n");
+    getchar();
     getln(&sentence);
 
-    int same = HaveSimilarEnding(row0, row1, 1);
+    int same = HaveSimilarEnding(row2, sentence, 1);
 
     if(same == 1)
     {
-        rowAfter = ReplaceWord(row1, before, sentence);
+        rowAfter = ReplaceWord(row3, "He/She …", sentence);
         free(sentence);
         return rowAfter;
 
@@ -381,27 +375,29 @@ char* BuildRow3(char* row1, char* row0)
     {
         printf("The two sentences don't rhyme.");
         free(sentence);
-        return row1;
+        return row3;
 
     }
 }
 
 char* BuildRow4(char* row)
 {
-    char* before = "…";
-    char* sentence = (char*)malloc(1*sizeof(char));
+    char* sentence;
     char* rowAfter;
+    char* rowAfter1;
 
-    rowAfter = DeleteWord(row, -1);
-    rowAfter = DeleteWord(rowAfter, 0);
+    rowAfter = ReplaceWord(row, "There was", "…");
+    rowAfter1 = DeleteWord(rowAfter, 0);
 
-    printf("Write a a begining that fits the sentence: \n%s \n*Note it's the first sentence with a new beginning.\n", rowAfter);
+
+    printf("\nWrite a beginning that fits the sentence: \n%s \n*Note it's the first sentence with a new beginning.\n", rowAfter1);
+    getchar();
     getln(&sentence);
 
-    rowAfter = InsertWord(rowAfter, 0, sentence);
+    rowAfter1 = ReplaceWord(rowAfter1, "…", sentence);
     free(sentence);
 
-    return rowAfter;
+    return rowAfter1;
 
 }
 
