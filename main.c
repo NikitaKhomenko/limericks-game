@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -45,25 +47,22 @@ void main() {
 
         switch(indexRow) {
             case 0:
-                fflush(stdin);
                 limerick[0] = BuildRow0(limerick[0]);
                 break;
             case 1:
-                fflush(stdin);
                 limerick[1] = BuildRow1(limerick[1], limerick[0]);
                 break;
             case 2:
-                fflush(stdin);
                 limerick[2] = BuildRow2(limerick[2]);
                 break;
             case 3:
-                fflush(stdin);
                 limerick[3] = BuildRow3(limerick[3], limerick[2]);
                 break;
             case 4:
-                fflush(stdin);
                 limerick[4] = BuildRow4(limerick[0]);
                 break;
+            case -1:
+                exit(0);
             default:
                 printf("You entered wrong value.");
                 break;
@@ -101,6 +100,8 @@ char* DeleteWord(char* str, int index)
     int charIndex = 0;
     int charIndexToDelete = 0;
     int i = 0;
+    char* newStr = (char*)malloc(strlen(str)*sizeof(char)+2);;
+
 
     // count number of words in string //
     while(str[charIndex] !='\0')
@@ -126,8 +127,7 @@ char* DeleteWord(char* str, int index)
         // delete chosen word //
     else
     {
-        char* newStr = (char*)malloc((strlen(str))*sizeof(char));
-        strncpy ( newStr, str, strlen(str) );
+        strcpy ( newStr, str);
 
         while(newStr[charIndexToDelete] != ' ' && newStr[charIndexToDelete] != '\0'){
             memmove(&newStr[charIndexToDelete], &newStr[charIndexToDelete + 1], strlen(newStr) - charIndexToDelete);
@@ -316,9 +316,9 @@ char* BuildRow1(char* row1, char* row0)
     getchar();
     getln(&rhyme);
 
-    int same = HaveSimilarEnding(row0, rhyme, 1);
+    int same1 = HaveSimilarEnding(row0, rhyme, 1);
 
-    if(same == 1)
+    if(same1 == 1)
     {
         rowAfter = ReplaceWord(row1, "…", rhyme);
         free(rhyme);
